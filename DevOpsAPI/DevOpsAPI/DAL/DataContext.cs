@@ -1,4 +1,5 @@
-﻿using DevOpsAPI.Infra;
+﻿using DevOpsAPI.Accounts;
+using DevOpsAPI.Infra;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevOpsAPI.DAL;
@@ -28,4 +29,6 @@ public class DataContext : DbContext
     {
         Database.EnsureDeleted();
     }
+
+    public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
 }
