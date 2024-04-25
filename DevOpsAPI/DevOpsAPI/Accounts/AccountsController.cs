@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using DevOpsAPI.DAL;
 using DevOpsAPI.Infra;
+using DevOpsAPI.Messages;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -57,6 +58,7 @@ public class AccountsController : ControllerBase
         {
             Login = req.Login,
             Password = req.Password,
+            Messages = new HashSet<MessageEntity>(),
         };
         await db.Accounts.AddAsync(newAcc);
         await db.SaveChangesAsync();

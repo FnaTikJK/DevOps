@@ -1,6 +1,8 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using DevOpsAPI.Accounts;
 using DevOpsAPI.Infra;
+using DevOpsAPI.Messages;
+using DevOpsAPI.Statics;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevOpsAPI.DAL;
@@ -37,6 +39,15 @@ public class DataContext : DbContext
         );
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FileEntity>()
+            .HasOne(f => f.Message)
+            .WithMany(m => m.Files)
+            .OnDelete(DeleteBehavior.Cascade);
+        base.OnModelCreating(modelBuilder);
+    }
+
     public void CreateDatabase()
     {
         Database.EnsureCreated();
@@ -48,4 +59,6 @@ public class DataContext : DbContext
     }
 
     public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
+    public DbSet<MessageEntity> Messages => Set<MessageEntity>();
+    public DbSet<FileEntity> Files => Set<FileEntity>();
 }

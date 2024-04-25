@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using DevOpsAPI;
-using DevOpsAPI.Chat;
 using DevOpsAPI.DAL;
 using DevOpsAPI.Infra;
+using DevOpsAPI.Messages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +51,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<ChatsHub>("/Hubs/Chats");
+app.MapHub<MessagesHub>("/Hubs/Messages");
 
 app.Run();

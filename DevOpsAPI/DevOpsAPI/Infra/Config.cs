@@ -18,6 +18,11 @@ public class Config
         BucketName = Environment.GetEnvironmentVariable("AWS_BUCKET_NAME")!,
     };
 
+    public static LocalSettings Local = new()
+    {
+        PathToStatic = @"./StaticFiles",
+    };
+
 
 
 
@@ -42,4 +47,9 @@ public class YandexSettings
     public string AccountSecretKey { get; set; }
     public string BucketName { get; set; }
     public string QueueUrl { get; set; }
+}
+
+public class LocalSettings
+{
+    public string PathToStatic { get; set; }
 }

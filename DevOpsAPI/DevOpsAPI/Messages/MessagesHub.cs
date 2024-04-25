@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace DevOpsAPI.Chat;
+namespace DevOpsAPI.Messages;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ChatsHub : Hub
+public class MessagesHub : Hub
 {
     
 }

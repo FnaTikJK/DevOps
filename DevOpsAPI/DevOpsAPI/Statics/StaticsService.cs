@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using DevOpsAPI.Infra;
+using Microsoft.Extensions.FileProviders;
 
 namespace DevOpsAPI.Statics;
 
@@ -32,7 +33,14 @@ public class StaticsService : IStaticsService
 
         await client.PutObjectAsync(req);
     }
-    
+
+    public async Task<Stream> Get(string key)
+    {
+        var res = await client.GetObjectAsync(bucketName, key);
+
+        return res.ResponseStream;
+    }
+
     public async Task Delete(string key)
     {
         await client.DeleteObjectAsync(bucketName, key);
