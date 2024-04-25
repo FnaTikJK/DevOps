@@ -64,7 +64,7 @@ public class AccountsController : ControllerBase
         return new ClaimsResponse(claimsIdentity, account.Id, CreateToken(claims));
     }
 
-    public string CreateToken(List<Claim> claims)
+    private string CreateToken(List<Claim> claims)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             Config.JwtSecurityKey));
