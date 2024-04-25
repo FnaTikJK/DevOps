@@ -2,7 +2,7 @@
 
 public class Config
 {
-    public const string JwtSecurityKey = "Token with 16 ch";
+    public static string JwtSecurityKey = string.Concat(Enumerable.Repeat("Token with 16 ch", 5).ToArray());
 
 
     public static string DbConnection = Environment.GetEnvironmentVariable("DATABASE_CONNECTION") 

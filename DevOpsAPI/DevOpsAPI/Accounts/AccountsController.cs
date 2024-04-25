@@ -3,7 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using DevOpsAPI.DAL;
 using DevOpsAPI.Infra;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,6 +22,16 @@ public class AccountsController : ControllerBase
         this.db = db;
     }
 
+    [HttpGet]
+    [Authorize]
+    public async Task<ActionResult> MyAcc()
+    {
+        return Ok(new
+        {
+           Id = User.GetId() 
+        });
+    }
+
     [HttpPost("Auth")]
     public async Task<ActionResult<ClaimsResponse>> Auth(RegReq req)
     {
@@ -27,7 +39,11 @@ public class AccountsController : ControllerBase
         if (existed == null)
             return BadRequest("Incorrect login/password");
 
-        return Ok(GetClaims(existed));
+        var claims = GetClaims(existed);
+        var principal = new ClaimsPrincipal(claims.Credentials);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+        return Ok(claims);
     }
 
     [HttpPost("Reg")]
@@ -66,8 +82,7 @@ public class AccountsController : ControllerBase
 
     private string CreateToken(List<Claim> claims)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            Config.JwtSecurityKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.JwtSecurityKey));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

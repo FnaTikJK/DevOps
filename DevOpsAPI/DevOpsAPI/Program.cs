@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using DevOpsAPI;
 using DevOpsAPI.Chat;
 using DevOpsAPI.DAL;
@@ -10,6 +11,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonConfig.DateOnlyJsonConverter());
     options.JsonSerializerOptions.Converters.Add(new JsonConfig.DateTimeConverter());
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
