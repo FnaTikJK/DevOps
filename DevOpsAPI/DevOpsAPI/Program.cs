@@ -1,3 +1,4 @@
+using DevOpsAPI;
 using DevOpsAPI.Chat;
 using DevOpsAPI.DAL;
 using DevOpsAPI.Infra;
@@ -24,6 +25,7 @@ builder.Services.AddSignalR(hubOptions =>
     hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(1);
 });
 
+Configurator.Configure(builder.Services);
 
 var app = builder.Build();
 
