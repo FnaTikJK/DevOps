@@ -15,7 +15,6 @@ type PageState = "loading" | "login" | "chat";
 
 function App() {
     const [pageState, setPageState] = useState<PageState>("loading");
-    const [errors, setErrors] = useState<ErrorMes[]>([]);
     const [user, setUser] = useState<User | null>(null);
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -32,24 +31,20 @@ function App() {
                 id: authInfo.data.id,
                 token: authInfo.data.jwtToken,
             });
-            setPageState("chat");
+            setPageState("login");
         })()
     }, []);
 
-    const pushErr = (err: ErrorMes) => {
-        var newErrors = errors.slice();
-        newErrors.push(err);
-        setErrors(newErrors);
+    const pushErr = (message: string) => {
+        messageApi.open({
+            type: "error",
+            content: message,
+        })
     };
-    const removeErr = (err: ErrorMes) => {
-        var newErrors = errors.slice();
-        const ind = newErrors.findIndex((e, ind, arr) => e === err);
-        newErrors.splice(ind);
-        setErrors(newErrors);
-    }
 
     return (
         <div className="App">
+            {contextHolder}
             {pageState === "loading" && <Loading/>}
             {pageState === "login" && <LoginForm
                 onSetUser={(user) => {
@@ -58,7 +53,6 @@ function App() {
                 }}
                 onPushError={(err) => pushErr(err)}
             />}
-            <Errors errors={errors} onRemove={removeErr}/>
             {/*<header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -83,38 +77,6 @@ const Loading = () => {
             <LoadingOutlined size={500}/>
             <p>Loading...</p>
         </>
-    )
-}
-
-const Errors = (props: { errors: ErrorMes[], onRemove: (err: ErrorMes) => void }) => {
-    const errors = props.errors;
-
-    return (
-        <div className={"ErrorContainer"}>
-            {errors.map(err =>
-                <Error
-                    onClose={() => props.onRemove(err)}
-                    errorMes={err}
-                />)}
-        </div>
-    )
-}
-
-export type ErrorMes = {
-    title: string, message: string
-}
-
-const Error = (props: { onClose: () => void, errorMes: ErrorMes }) => {
-    return (
-        <div className={"Error"}>
-            <Alert
-                message={props.errorMes.title}
-                description={props.errorMes.message}
-                type="error"
-                closable
-                onClose={props.onClose}
-            />
-        </div>
     )
 }
 

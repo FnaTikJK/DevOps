@@ -1,15 +1,13 @@
 import LockOutlined from "@ant-design/icons/lib/icons/LockOutlined";
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import {Button, Form, Input, Radio } from "antd";
-import {ErrorMes, User} from "./App";
-import {debug} from "util";
+import {User} from "./App";
 import {useState} from "react";
-import {api, AuthInfo} from "./api";
-import {AxiosResponse} from "axios";
+import {api} from "./api";
 
 type Props = {
     onSetUser: (user: User) => void,
-    onPushError: (error: ErrorMes) => void,
+    onPushError: (message: string) => void,
 }
 
 export const LoginForm = (props: Props) => {
@@ -23,7 +21,7 @@ export const LoginForm = (props: Props) => {
 
         if (values.Login.indexOf(" ") > -1 || values.Password.indexOf(" ") > -1
             || values.Login.length === 0 || values.Password.length === 0) {
-            props.onPushError({title: "Неправильные значения", message: "Поля не должны содержать пробелы"});
+            props.onPushError("Поля не должны содержать пробелы");
             setIsLoading(false);
         }
 
@@ -34,16 +32,10 @@ export const LoginForm = (props: Props) => {
 
             props.onSetUser({id: response.data.id, token: response.data.jwtToken});
         } catch (e) {
-            props.onPushError({
-                // @ts-ignore
-                title: `${e.response.status} ${e.response.statusText}`,
-                // @ts-ignore
-                message: e.response.data}
-            );
+            // @ts-ignore
+            props.onPushError( `${e.response.status}\n${e.response.data}`);
             setIsLoading(false)
         }
-
-
     }
 
     return (
