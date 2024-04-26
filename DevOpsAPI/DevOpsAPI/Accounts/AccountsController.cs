@@ -25,12 +25,16 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult> MyAcc()
+    public async Task<ActionResult<ClaimsResponse>> MyAcc()
     {
-        return Ok(new
-        {
-           Id = User.GetId() 
-        });
+        var existed = await db.Accounts.FindAsync(User.GetId());
+        if (existed == null)
+            return BadRequest("Account doesn't exist");
+
+        var claims = GetClaims(existed);
+        var principal = new ClaimsPrincipal(claims.Credentials);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+        return Ok(claims);
     }
 
     [HttpPost("Auth")]
