@@ -1,14 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {api} from "./api";
-import LoadingOutlined from '@ant-design/icons/lib/icons/LoadingOutlined';
 import {LoginForm} from "./LoginForm";
-import {Alert, message} from "antd";
+import {message} from "antd";
+import {AxiosError} from "axios";
+import { Loading } from './Loading';
+import { ChatForm } from './Chat/ChatForm';
 
 export type User = {
     id: string,
     token: string,
+    login: string,
 };
 
 type PageState = "loading" | "login" | "chat";
@@ -21,17 +23,22 @@ function App() {
 
     useEffect(() => {
         (async () => {
-            const authInfo = await api.acc.my();
-            if (authInfo.status === 401 || authInfo.status === 403) {
-                setPageState("login");
-                return;
+            try {
+                const authInfo = await api.acc.my();
+                setUser({
+                    id: authInfo.data.id,
+                    token: authInfo.data.jwtToken,
+                    login: authInfo.data.login,
+                });
+                setPageState("chat");
+            } catch (e){
+                const axErr = e as AxiosError;
+                if (axErr?.response?.status === 401)
+                    setPageState("login");
+                else{
+                    pushErr(axErr.message);
+                }
             }
-
-            setUser({
-                id: authInfo.data.id,
-                token: authInfo.data.jwtToken,
-            });
-            setPageState("login");
         })()
     }, []);
 
@@ -53,31 +60,19 @@ function App() {
                 }}
                 onPushError={(err) => pushErr(err)}
             />}
-            {/*<header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>*/}
+            {pageState === "chat" && <ChatForm
+                user={user as User}
+                onLogout={() => {
+                    setPageState("login");
+                    setUser(null);
+                    api.acc.logout();
+                }}
+                onPushErr={(err) => pushErr(err)}
+            />}
         </div>
     );
 }
 
-const Loading = () => {
-    return (
-        <>
-            <LoadingOutlined size={500}/>
-            <p>Loading...</p>
-        </>
-    )
-}
+
 
 export default App;

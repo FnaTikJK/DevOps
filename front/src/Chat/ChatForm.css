@@ -1,0 +1,20 @@
+.header {
+    height: 32px;
+    margin: auto;
+    background-color: slategray;
+}
+
+.account {
+    float: left;
+}
+
+.logout {
+    float: right;
+}
+
+.chat {
+    height: 400px;
+    overflow: auto;
+    padding: 0 16px;
+    border: 1px solid rgba(140, 140, 140, 0.35);
+}

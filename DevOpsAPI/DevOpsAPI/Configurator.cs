@@ -1,5 +1,6 @@
 ﻿using Amazon.Runtime;
 using DevOpsAPI.Infra;
+using DevOpsAPI.Messages;
 using DevOpsAPI.Statics;
 
 namespace DevOpsAPI;
@@ -12,6 +13,8 @@ public static class Configurator
             ConfigureCloud(services);
         else
             ConfigureLocal(services);
+
+        services.AddScoped<MessagesNotifier>();
         
         return services;
     }

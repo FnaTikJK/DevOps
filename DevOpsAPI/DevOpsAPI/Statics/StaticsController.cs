@@ -20,30 +20,43 @@ public class StaticsController : ControllerBase
         this.db = db;
     }
 
-    [HttpPost("Upload")]
-    public async Task<ActionResult> Upload(IFormFile file)
+    public class UploadReq
     {
-        var key = Guid.NewGuid().ToString();
-        await using(var stream = file.OpenReadStream()){
-            await staticsService.Create(key, stream);
-        }
-        
-        var fileEntity = new FileEntity
-        {
-            Key = key,
-            FileName = file.FileName,
-            ContentType = file.ContentType,
-        };
-        await db.Files.AddAsync(fileEntity);
-        await db.SaveChangesAsync();
-
-        return Ok(new {FileId = fileEntity.Id});
+        public IFormFile[] Files { get; set; }
     }
 
-    [HttpPost("Download")]
-    public async Task<FileStreamResult> Download([FromBody] DownloadFileReq request)
+    [Consumes("multipart/form-data")]
+    [HttpPost("Upload")]
+    public async Task<ActionResult> Upload([FromForm]UploadReq req)
     {
-        var existed = await db.Files.FindAsync(request.FileId);
+        if (req.Files.Length == 0)
+            return BadRequest("Empty Files");
+        
+        var files = req.Files;
+        var fileEntities = new List<FileEntity>(files.Length);
+        foreach (var file in files)
+        {
+            await using var stream = file.OpenReadStream();
+            var key = Guid.NewGuid().ToString();
+            await staticsService.Create(key, stream);
+            fileEntities.Add(new FileEntity
+            {
+                Key = key,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+            });
+        }
+        
+        await db.Files.AddRangeAsync(fileEntities);
+        await db.SaveChangesAsync();
+
+        return Ok(new {FileIds = fileEntities.Select(f => f.Id)});
+    }
+
+    [HttpPost("Download/{fileId:Guid}")]
+    public async Task<FileStreamResult> Download([FromRoute] Guid fileId)
+    {
+        var existed = await db.Files.FindAsync(fileId);
         if (existed == null)
             throw new Exception("File doesn't existed");
         var stream = await staticsService.Get(existed.Key);
@@ -53,10 +66,5 @@ public class StaticsController : ControllerBase
         };
 
         //await HttpContext.Response.SendFileAsync(fileInfo);
-    }
-
-    public class DownloadFileReq
-    {
-        public Guid FileId { get; set; }
     }
 }

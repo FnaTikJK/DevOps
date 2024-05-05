@@ -4,6 +4,7 @@ import {Button, Form, Input, Radio } from "antd";
 import {User} from "./App";
 import {useState} from "react";
 import {api} from "./api";
+import './LoginForm.css';
 
 type Props = {
     onSetUser: (user: User) => void,
@@ -30,7 +31,7 @@ export const LoginForm = (props: Props) => {
                 ? await api.acc.reg(values.Login, values.Password)
                 : await api.acc.auth(values.Login, values.Password);
 
-            props.onSetUser({id: response.data.id, token: response.data.jwtToken});
+            props.onSetUser({id: response.data.id, token: response.data.jwtToken, login: response.data.login});
         } catch (e) {
             // @ts-ignore
             props.onPushError( `${e.response.status}\n${e.response.data}`);
@@ -39,7 +40,7 @@ export const LoginForm = (props: Props) => {
     }
 
     return (
-        <>
+        <div className={"main"}>
             <Form name="normal_login" initialValues={{ remember: true }} onFinish={onAuth} disabled={isLoading}>
                 <Form.Item>
                     <Radio.Group defaultValue="login" onChange={(e) => setIsReg(e.target.value === "reg")}>
@@ -67,6 +68,6 @@ export const LoginForm = (props: Props) => {
                     </Button>
                 </Form.Item>
             </Form>
-        </>
+        </div>
     );
 }

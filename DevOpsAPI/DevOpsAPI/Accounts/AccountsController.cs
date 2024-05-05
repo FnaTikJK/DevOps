@@ -25,7 +25,7 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<ClaimsResponse>> MyAcc()
+    public async Task<ActionResult<AuthResp>> MyAcc()
     {
         var existed = await db.Accounts.FindAsync(User.GetId());
         if (existed == null)
@@ -34,11 +34,24 @@ public class AccountsController : ControllerBase
         var claims = GetClaims(existed);
         var principal = new ClaimsPrincipal(claims.Credentials);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        return Ok(claims);
+        return Ok(new AuthResp
+        {
+            Login = existed.Login,
+            JwtToken = claims.JwtToken,
+            Id = existed.Id,
+        });
+    }
+
+    [HttpPost("Logout")]
+    [Authorize]
+    public async Task<ActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return NoContent();
     }
 
     [HttpPost("Auth")]
-    public async Task<ActionResult<ClaimsResponse>> Auth(RegReq req)
+    public async Task<ActionResult<AuthResp>> Auth(RegReq req)
     {
         var existed = db.Accounts.FirstOrDefault(e => e.Login == req.Login && e.Password == req.Password);
         if (existed == null)
@@ -48,11 +61,16 @@ public class AccountsController : ControllerBase
         var principal = new ClaimsPrincipal(claims.Credentials);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-        return Ok(claims);
+        return Ok(new AuthResp
+        {
+            Login = existed.Login,
+            JwtToken = claims.JwtToken,
+            Id = existed.Id,
+        });
     }
 
     [HttpPost("Reg")]
-    public async Task<ActionResult<ClaimsResponse>> Reg(RegReq req)
+    public async Task<ActionResult<AuthResp>> Reg(RegReq req)
     {
         var existed = db.Accounts.FirstOrDefault(e => e.Login == req.Login);
         if (existed != null)
@@ -67,6 +85,13 @@ public class AccountsController : ControllerBase
         await db.Accounts.AddAsync(newAcc);
         await db.SaveChangesAsync();
         return await Auth(req);
+    }
+
+    public class AuthResp
+    {
+        public Guid Id { get; set; }
+        public string JwtToken { get; set; }
+        public string Login { get; set; }
     }
 
     public class RegReq
