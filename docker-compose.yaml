@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  app:
+    image: devops-back
+    container_name: back
+    ports:
+      - 800:80
+      - 4430:443
+    networks:
+      - my-network
+
+  front:
+    image: devops-front
+    container_name: front
+    depends_on:
+      - app
+    ports:
+      - 1337:80
+    networks:
+      - my-network
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    networks:
+      - my-network
+
+
+networks:
+  my-network:
+    driver: bridge
