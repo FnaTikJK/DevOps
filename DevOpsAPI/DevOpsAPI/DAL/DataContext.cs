@@ -27,6 +27,7 @@ public class DataContext : DbContext
 
                 if (Config.Yandex.PathToCert != null)
                 {
+                    builder.RemoteCertificateValidationCallback((s, c, ch, sslPolicyErrors) => true);
                     builder.ProvideClientCertificatesCallback(clientCerts =>
                     {
                         var clientCertPath = Config.Yandex.PathToCert;
