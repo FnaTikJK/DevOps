@@ -23,6 +23,8 @@ export const getHub = (props: hubProps) => {
         .withUrl(url, {
             withCredentials: true,
             accessTokenFactory: () => props.token,
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
         })
         .withAutomaticReconnect()
         .build();
