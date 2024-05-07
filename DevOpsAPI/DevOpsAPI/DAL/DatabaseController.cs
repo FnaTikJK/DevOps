@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using DevOpsAPI.Infra;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DevOpsAPI.DAL;
 
@@ -11,6 +13,20 @@ public class DatabaseController : ControllerBase
     public DatabaseController(DataContext db)
     {
         this.db = db;
+    }
+
+    [HttpGet("Info")]
+    public ActionResult GetInfo()
+    {
+        return Ok(new
+        {
+            UseCloud = Config.Yandex.UseCloud,
+            PathToCert = Config.Yandex.PathToCert,
+            AccountAccessKey = Config.Yandex.AccountAccessKey,
+            AccountSecretKey = Config.Yandex.AccountSecretKey,
+            BucketName = Config.Yandex.BucketName,
+            DbConnection = Config.DbConnection,
+        });
     }
 
     [HttpPost]
