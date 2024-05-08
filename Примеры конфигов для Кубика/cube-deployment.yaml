@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: application
+  labels:
+    app: api-application
+    env: Production
+    owner: AntonYaskov
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: api
+  template:
+    metadata:
+      labels:
+        project: api
+    spec:
+      containers:
+        - name: application-back
+          image: 
+          ports:
+            - containerPort: 80
+          env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Debug
+          - name: HOST
+            value: 
+          - name: DATABASE_CONNECTION
+            value: "host=postgres-db-service;port=5432;database=;username=postgres;password=password"
+          - name: MAILBOX_LOGIN
+            value: 
+          - name: MAILBOX_PASSWORD
+            value: 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  namespace: application
+  labels:
+    app: front-application
+    env: Production
+    owner: AntonYaskov
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: front
+  template:
+    metadata:
+      labels:
+        project: front
+    spec:
+      containers:
+        - name: application-front
+          image: 
+          ports:
+            - containerPort: 80
+          env:
+          - name: API_URL
+            value: 
+          - name: API_PROTOCOL
+            value: "https"
+          - name: API_CHAT_HUB_URL 
+            value: "Hubs/Chats"
+          - name: API_CRM_HUB_URL
+            value: "Hubs/Crm"
