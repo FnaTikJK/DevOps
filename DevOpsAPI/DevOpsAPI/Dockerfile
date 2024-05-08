@@ -2,6 +2,9 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
+# SQL Server trusted connection problem
+RUN sed -i 's/CipherString = DEFAULT@SECLEVEL=2/CipherString = DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
+
 EXPOSE 80
 EXPOSE 443
 
@@ -27,4 +30,5 @@ COPY --from=publish /app/publish .
 COPY --from=certAdd /app/Cert /app/Cert
 RUN mkdir -p Logs
 RUN mkdir -p StaticFiles
+ENV YANDEX_PATH_TO_CERT=Cert/root.crt
 ENTRYPOINT ["dotnet", "DevOpsAPI.dll"]

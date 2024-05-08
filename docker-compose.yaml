@@ -2,8 +2,14 @@ version: "3.8"
 
 services:
   app:
-    image: devops-back
-    container_name: back
+    image: cr.yandex/crpf4id8lbgetpgvvgss/devops-back
+    container_name: app
+    environment:
+      - YANDEX_USE_CLOUD=TRUE
+      - AWS_ACCESS_KEY=
+      - AWS_SECRET_KEY=
+      - AWS_BUCKET_NAME=
+      - DATABASE_CONNECTION=
     ports:
       - 800:80
       - 4430:443
@@ -11,7 +17,7 @@ services:
       - my-network
 
   front:
-    image: devops-front
+    image: cr.yandex/crpf4id8lbgetpgvvgss/devops-front
     container_name: front
     depends_on:
       - app
